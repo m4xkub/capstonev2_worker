@@ -1,17 +1,10 @@
 package main
 
 import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
+	"github.com/m4xkub/capstonev2_worker/controller"
 )
 
 func main() {
-	r := gin.Default()
-
-	r.GET("/healthCheck", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"message": "Green"})
-	})
-
+	r := controller.GetRootController()
 	r.Run(":8080")
 }
