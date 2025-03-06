@@ -1,5 +1,3 @@
-package services
-
 import (
 	"fmt"
 	"net/http"
@@ -10,7 +8,7 @@ import (
 )
 
 func HealthCheck(c *gin.Context) {
-
+	fmt.Println("test-log")
 	// to do
 	// extract output to see if it ready to work
 
@@ -24,7 +22,12 @@ func HealthCheck(c *gin.Context) {
 		return
 	}
 
-	raw_output := strings.Split("/n", string(output))
+	//raw_output := strings.Split("\n",string(output))
+	raw_output := strings.Split(string(output), "\n")
+
+	fmt.Println("output : ", string(output))
+	fmt.Println("raw_output : ", raw_output)
+
 	for i, e := range raw_output {
 		raw_output[i] = strings.TrimSpace(e)
 	}
@@ -36,15 +39,25 @@ func HealthCheck(c *gin.Context) {
 			continue
 		}
 
-		tmpElement := strings.Split(" ", e)
-		for _, e := range tmpElement {
-			if !strings.Contains(e, ":") {
-				continue
-			}
-
+		if strings.Contains(e, "mydrbd role") {
 			x := strings.Split(e, ":")
-			status[x[0]] = x[1]
+			status["role"] = x[1]
+		} else if strings.Contains(e, "disk") {
+			x := strings.Split(e, ":")
+			status["disk-status"] = x[1]
+			break
 		}
+
+		/*      tmpElement := strings.Split(" ", e)
+		for _, e := range tmpElement {
+				if !strings.Contains(e, ":") {
+						continue
+				}
+
+				x := strings.Split(e, ":")
+				fmt.Println(x[0])
+				status[x[0]] = x[1]
+		}*/
 
 	}
 
@@ -52,5 +65,5 @@ func HealthCheck(c *gin.Context) {
 	// fmt.Println(status["role"])
 	fmt.Println(status["disk"])
 	fmt.Println(status["peer-disk"])
-	c.JSON(http.StatusOK, gin.H{"message": string(output)})
+	c.JSON(http.StatusOK, gin.H{"message": status})
 }
