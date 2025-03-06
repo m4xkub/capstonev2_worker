@@ -8,7 +8,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o worker .
+RUN GOOS=linux GOARCH=amd64 go build -o worker .
 
 FROM ubuntu:latest
 

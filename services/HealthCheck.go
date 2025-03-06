@@ -14,8 +14,8 @@ func HealthCheck(c *gin.Context) {
 	// to do
 	// extract output to see if it ready to work
 
-	// cmd := exec.Command("sudo", "drbdadm", "status")
-	cmd := exec.Command("cat", "./test.txt")
+	cmd := exec.Command("/usr/sbin/drbdadm", "status")
+	// cmd := exec.Command("cat", "./test.txt")
 
 	output, err := cmd.Output()
 
