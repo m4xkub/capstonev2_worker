@@ -1,10 +1,9 @@
-package services
+package drbd
 
 import (
 	"fmt"
 	"net/http"
 	"os/exec"
-
 	"github.com/gin-gonic/gin"
 )
 
