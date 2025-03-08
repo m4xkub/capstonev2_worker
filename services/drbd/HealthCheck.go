@@ -67,5 +67,5 @@ func HealthCheck(c *gin.Context) {
 	// fmt.Println(status["role"])
 	fmt.Println(status["disk"])
 	fmt.Println(status["peer-disk"])
-	c.JSON(http.StatusOK, gin.H{"message": status})
+	c.JSON(http.StatusOK, status)
 }
