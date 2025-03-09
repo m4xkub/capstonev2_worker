@@ -10,12 +10,7 @@ import (
 )
 
 func HealthCheck(c *gin.Context) {
-	fmt.Println("test-log")
-	// to do
-	// extract output to see if it ready to work
-
 	cmd := exec.Command("/usr/sbin/drbdadm", "status")
-	// cmd := exec.Command("cat", "./test.txt")
 
 	output, err := cmd.Output()
 
@@ -50,21 +45,8 @@ func HealthCheck(c *gin.Context) {
 			break
 		}
 
-		/*      tmpElement := strings.Split(" ", e)
-		for _, e := range tmpElement {
-				if !strings.Contains(e, ":") {
-						continue
-				}
-
-				x := strings.Split(e, ":")
-				fmt.Println(x[0])
-				status[x[0]] = x[1]
-		}*/
-
 	}
 
-	// fmt.Println(string(output))
-	// fmt.Println(status["role"])
 	fmt.Println(status["disk"])
 	fmt.Println(status["peer-disk"])
 	c.JSON(http.StatusOK, status)
