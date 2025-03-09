@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os/exec"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func runCommand(name string, args ...string) error {
@@ -17,14 +19,14 @@ func runCommand(name string, args ...string) error {
 	return err
 }
 
-func InitializeInstance() {
-	fmt.Println("Updating system...")
-	runCommand("sudo", "apt", "update")
-	time.Sleep(10 * time.Second) // Sleep for 5 seconds
+func InitializeInstance(c *gin.Context) {
+	// fmt.Println("Updating system...")
+	// runCommand("sudo", "apt", "update")
+	// time.Sleep(10 * time.Second) // Sleep for 5 seconds
 
-	fmt.Println("Upgrading system...")
-	runCommand("sudo", "apt", "upgrade", "-y")
-	time.Sleep(10 * time.Second)
+	// fmt.Println("Upgrading system...")
+	// runCommand("sudo", "apt", "upgrade", "-y")
+	// time.Sleep(10 * time.Second)
 
 	fmt.Println("Installing drbd-utils...")
 	runCommand("sudo", "apt", "install", "drbd-utils", "-y")

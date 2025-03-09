@@ -8,7 +8,7 @@ import (
 
 func GetRootController() *gin.Engine {
 	r := gin.Default()
-
+	r.GET("/test", drbd.InitializeInstance)
 	r.GET("/healthCheck", drbd.HealthCheck)
 	r.GET("/promote", drbd.Promote)
 	r.GET("/demote", drbd.Demote)
