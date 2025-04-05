@@ -3,10 +3,17 @@ package drbd
 import (
 	"fmt"
 	"os/exec"
-	"time"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
+
+type InitializationRequest struct {
+	PrivateIp1 string `json:"private_ip_1"`
+	PrivateIp2 string `json:"private_ip_2"`
+	PrivateIp3 string `json:"private_ip_3"`
+	DiskName   string `json:"disk_name"`
+}
 
 func runCommand(name string, args ...string) error {
 	cmd := exec.Command(name, args...)
@@ -20,27 +27,35 @@ func runCommand(name string, args ...string) error {
 }
 
 func InitializeInstance(c *gin.Context) {
-	// fmt.Println("Updating system...")
-	// runCommand("sudo", "apt", "update")
-	// time.Sleep(10 * time.Second) // Sleep for 5 seconds
 
-	// fmt.Println("Upgrading system...")
-	// runCommand("sudo", "apt", "upgrade", "-y")
-	// time.Sleep(10 * time.Second)
+	var req InitializationRequest
 
-	fmt.Println("Installing drbd-utils...")
-	runCommand("sudo", "apt", "install", "drbd-utils", "-y")
-	time.Sleep(10 * time.Second)
-
-	fmt.Println("Performing another upgrade...")
-	runCommand("sudo", "apt", "-y", "upgrade")
-	time.Sleep(10 * time.Second)
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
 
 	fmt.Println("Creating DRBD configuration file...")
-	runCommand("sudo", "touch", "/etc/drbd.d/mydrbd.res")
+	runCommand("ln", "/etc/drbd.d/mydrbd.res", "./mydrbd.res")
 
-	fmt.Println("test touch file")
-	runCommand("sudo", "touch", "./test.res")
+	manageResFile("1", req.PrivateIp1, req.DiskName)
+	manageResFile("2", req.PrivateIp2, req.DiskName)
+	manageResFile("3", req.PrivateIp3, req.DiskName)
 
 	fmt.Println("Initialization complete!")
+}
+
+func manageResFile(instanceNumber string, privateIp string, diskname string) {
+	parts := strings.Split(privateIp, ".")
+
+	hostname := "ip" + "-" + strings.Join(parts, "-")
+
+	// hostname
+	runCommand("sed", "-i", fmt.Sprintf("s/hostname%s/%s/g", instanceNumber, hostname), "./mydrbd.res")
+
+	// disk
+	runCommand("sed", "-i", fmt.Sprintf("s/ec2disk%s/%s/g", instanceNumber, diskname), "./mydrbd.res")
+
+	// private ip
+	runCommand("sed", "-i", fmt.Sprintf("s/privateIp%s/%s/g", instanceNumber, privateIp), "./mydrbd.res")
 }
