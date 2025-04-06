@@ -11,8 +11,8 @@ import (
 type InitializationRequest struct {
 	PrivateIp1 string `json:"private_ip_1"`
 	PrivateIp2 string `json:"private_ip_2"`
-	PrivateIp3 string `json:"private_ip_3"`
-	DiskName   string `json:"disk_name"`
+	// PrivateIp3 string `json:"private_ip_3"`
+	DiskName string `json:"disk_name"`
 }
 
 func escapeSlashes(input string) string {
@@ -60,7 +60,7 @@ func InitializeConfigFile(c *gin.Context) {
 
 	manageResFile("1", req.PrivateIp1, req.DiskName)
 	manageResFile("2", req.PrivateIp2, req.DiskName)
-	manageResFile("3", req.PrivateIp3, req.DiskName)
+	// manageResFile("3", req.PrivateIp3, req.DiskName)
 
 	runCommand("ln", "./mydrbd.res", "/etc/drbd.d/mydrbd.res")
 	fmt.Println("Initialization complete!")
