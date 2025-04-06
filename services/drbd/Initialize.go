@@ -15,18 +15,39 @@ type InitializationRequest struct {
 	DiskName   string `json:"disk_name"`
 }
 
+func escapeSlashes(input string) string {
+	return strings.ReplaceAll(input, "/", "\\/")
+}
+
 func runCommand(name string, args ...string) error {
 	cmd := exec.Command(name, args...)
 	cmd.Stdout = nil
 	cmd.Stderr = nil
 	err := cmd.Run()
 	if err != nil {
-		fmt.Printf("Error executing %s: %v\n", name, err)
+		fmt.Printf("Error executing %s: %s\n", name, err.Error())
 	}
 	return err
 }
 
-func InitializeInstance(c *gin.Context) {
+func manageResFile(instanceNumber string, privateIp string, diskname string) {
+	parts := strings.Split(privateIp, ".")
+
+	hostname := "ip" + "-" + strings.Join(parts, "-")
+
+	escapedDiskname := escapeSlashes(diskname)
+
+	// hostname
+	runCommand("sed", "-i", fmt.Sprintf("s/hostname%s/%s/g", instanceNumber, hostname), "./mydrbd.res")
+
+	// disk
+	runCommand("sed", "-i", fmt.Sprintf("s/ec2disk%s/%s/g", instanceNumber, escapedDiskname), "./mydrbd.res")
+
+	// private ip
+	runCommand("sed", "-i", fmt.Sprintf("s/privateIp%s/%s/g", instanceNumber, privateIp), "./mydrbd.res")
+}
+
+func InitializeConfigFile(c *gin.Context) {
 
 	var req InitializationRequest
 
@@ -36,26 +57,23 @@ func InitializeInstance(c *gin.Context) {
 	}
 
 	fmt.Println("Creating DRBD configuration file...")
-	runCommand("ln", "/etc/drbd.d/mydrbd.res", "./mydrbd.res")
 
 	manageResFile("1", req.PrivateIp1, req.DiskName)
 	manageResFile("2", req.PrivateIp2, req.DiskName)
 	manageResFile("3", req.PrivateIp3, req.DiskName)
 
+	runCommand("ln", "./mydrbd.res", "/etc/drbd.d/mydrbd.res")
 	fmt.Println("Initialization complete!")
 }
 
-func manageResFile(instanceNumber string, privateIp string, diskname string) {
-	parts := strings.Split(privateIp, ".")
+func InitializeMetaData(c *gin.Context) {
 
-	hostname := "ip" + "-" + strings.Join(parts, "-")
+	fmt.Println("Creating DRBD Meta Data")
 
-	// hostname
-	runCommand("sed", "-i", fmt.Sprintf("s/hostname%s/%s/g", instanceNumber, hostname), "./mydrbd.res")
+	runCommand("sudo", "drbdadm", "create-md", "mydrbd")
+	runCommand("sudo", "drbdadm", "up", "mydrbd")
+	runCommand("sudo", "drbdadm", "secondary", "mydrbd")
 
-	// disk
-	runCommand("sed", "-i", fmt.Sprintf("s/ec2disk%s/%s/g", instanceNumber, diskname), "./mydrbd.res")
+	fmt.Println("DRBD Meta Data Created")
 
-	// private ip
-	runCommand("sed", "-i", fmt.Sprintf("s/privateIp%s/%s/g", instanceNumber, privateIp), "./mydrbd.res")
 }
