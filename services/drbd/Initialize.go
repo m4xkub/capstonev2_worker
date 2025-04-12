@@ -18,7 +18,7 @@ func escapeSlashes(input string) string {
 	return strings.ReplaceAll(input, "/", "\\/")
 }
 
-func runCommand(name string, args ...string) error {
+func RunCommand(name string, args ...string) error {
 	cmd := exec.Command(name, args...)
 	cmd.Stdout = nil
 	cmd.Stderr = nil
@@ -37,13 +37,13 @@ func manageResFile(instanceNumber string, privateIp string, diskname string) {
 	escapedDiskname := escapeSlashes(diskname)
 
 	// hostname
-	runCommand("sed", "-i", fmt.Sprintf("s/hostname%s/%s/g", instanceNumber, hostname), "./mydrbd.res")
+	RunCommand("sed", "-i", fmt.Sprintf("s/hostname%s/%s/g", instanceNumber, hostname), "./mydrbd.res")
 
 	// disk
-	runCommand("sed", "-i", fmt.Sprintf("s/ec2disk%s/%s/g", instanceNumber, escapedDiskname), "./mydrbd.res")
+	RunCommand("sed", "-i", fmt.Sprintf("s/ec2disk%s/%s/g", instanceNumber, escapedDiskname), "./mydrbd.res")
 
 	// private ip
-	runCommand("sed", "-i", fmt.Sprintf("s/privateIp%s/%s/g", instanceNumber, privateIp), "./mydrbd.res")
+	RunCommand("sed", "-i", fmt.Sprintf("s/privateIp%s/%s/g", instanceNumber, privateIp), "./mydrbd.res")
 }
 
 func InitializeConfigFile(c *gin.Context) {
@@ -60,7 +60,7 @@ func InitializeConfigFile(c *gin.Context) {
 	manageResFile("1", req.PrivateIp1, req.DiskName)
 	manageResFile("2", req.PrivateIp2, req.DiskName)
 
-	runCommand("ln", "./mydrbd.res", "/etc/drbd.d/mydrbd.res")
+	RunCommand("ln", "./mydrbd.res", "/etc/drbd.d/mydrbd.res")
 	fmt.Println("Initialization complete!")
 }
 
@@ -68,10 +68,14 @@ func InitializeMetaData(c *gin.Context) {
 
 	fmt.Println("Creating DRBD Meta Data")
 
-	runCommand("sudo", "drbdadm", "create-md", "mydrbd")
-	runCommand("sudo", "drbdadm", "up", "mydrbd")
-	runCommand("sudo", "drbdadm", "secondary", "mydrbd")
+	RunCommand("sudo", "drbdadm", "create-md", "mydrbd")
+	RunCommand("sudo", "drbdadm", "up", "mydrbd")
+	RunCommand("sudo", "drbdadm", "secondary", "mydrbd")
 
 	fmt.Println("DRBD Meta Data Created")
+
+}
+
+func mountVolume() {
 
 }
