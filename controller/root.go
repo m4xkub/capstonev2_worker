@@ -14,5 +14,6 @@ func GetRootController() *gin.Engine {
 	r.GET("/promote", drbd.Promote)
 	r.GET("/demote", drbd.Demote)
 	r.POST("/addClient", nbd.AddClient)
+	r.GET("/drbdCheck", drbd.DrbdCheck)
 	return r
 }
