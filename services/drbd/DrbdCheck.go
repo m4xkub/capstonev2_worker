@@ -16,7 +16,7 @@ func DrbdCheck(c *gin.Context) {
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
-
+	fmt.Println(string(output))
 	if string(output) == "no resources defined!" {
 		c.JSON(http.StatusNotImplemented, gin.H{
 			"message": "drbd is not init yet",
