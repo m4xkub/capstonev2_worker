@@ -14,7 +14,7 @@ func DrbdCheck(c *gin.Context) {
 	// Run and get output
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("Error:", err.Error())
 	}
 	fmt.Println(string(output))
 	if string(output) == "no resources defined!" {
