@@ -32,24 +32,14 @@ import (
 func DrbdCheck(c *gin.Context) {
 	cmd := exec.Command("drbdadm", "status")
 
-	output, err := cmd.CombinedOutput() // output includes both stdout + stderr
+	output, err := cmd.CombinedOutput()
 
-	// Always print the full output, even if there's an error
 	fmt.Println("DRBD command output:\n", string(output))
 
 	if err != nil {
-		// Return output + error as JSON
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   err.Error(),
-			"details": string(output),
-		})
-		return
-	}
-
-	// Handle special case: "no resources defined!"
-	if string(output) == "no resources defined!" {
-		c.JSON(http.StatusNotImplemented, gin.H{
-			"message": "drbd is not init yet",
+			"message": string(output),
 		})
 		return
 	}
