@@ -71,7 +71,7 @@ func InitializeMetaData(c *gin.Context) {
 	RunCommand("sudo", "drbdadm", "create-md", "mydrbd")
 	RunCommand("sudo", "drbdadm", "up", "mydrbd")
 	RunCommand("sudo", "drbdadm", "secondary", "mydrbd")
-
+	RunCommand("sudo", "mkfs.ext4", "/dev/drbd0")
 	fmt.Println("DRBD Meta Data Created")
 
 }
@@ -79,8 +79,6 @@ func InitializeMetaData(c *gin.Context) {
 func MountVolume() {
 	fmt.Println("Mounting file")
 
-	RunCommand("sudo", "mkfs.ext4", "/dev/drbd0")
-	RunCommand("sudo", "mkdir", "/mnt")
 	RunCommand("sudo", "mount", "/dev/drbd0", "/mnt")
 
 	fmt.Println("Mounted file")
