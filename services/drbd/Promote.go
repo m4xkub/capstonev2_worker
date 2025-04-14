@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os/exec"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,6 +18,7 @@ func Promote(c *gin.Context) {
 		return
 	}
 
+	MountVolume()
 	c.JSON(http.StatusOK, gin.H{"message": string(output)})
 
 }

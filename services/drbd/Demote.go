@@ -9,6 +9,7 @@ import (
 )
 
 func Demote(c *gin.Context) {
+	UnVolume()
 	cmd := exec.Command("sudo", "drbdadm", "secondary", "mydrbd")
 
 	output, err := cmd.Output()
@@ -17,7 +18,6 @@ func Demote(c *gin.Context) {
 		fmt.Println("Error:", err.Error())
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{"message": string(output)})
 
 }

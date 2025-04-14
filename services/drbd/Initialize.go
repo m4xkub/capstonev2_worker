@@ -76,6 +76,22 @@ func InitializeMetaData(c *gin.Context) {
 
 }
 
-func mountVolume() {
+func MountVolume() {
+	fmt.Println("Mounting file")
+
+	RunCommand("sudo", "mkfs.ext4", "/dev/drbd0")
+	RunCommand("sudo", "mkdir", "/mnt")
+	RunCommand("sudo", "mount", "/dev/drbd0", "/mnt")
+
+	fmt.Println("Mounted file")
+
+}
+
+func UnVolume() {
+	fmt.Println("Unmounting file")
+
+	RunCommand("sudo", "umount", "/mnt")
+
+	fmt.Println("unmounted file")
 
 }
