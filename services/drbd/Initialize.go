@@ -69,7 +69,9 @@ func InitializeMetaData(c *gin.Context) {
 	fmt.Println("Creating DRBD Meta Data")
 
 	RunCommand("sudo", "drbdadm", "create-md", "mydrbd")
+	fmt.Println("-----------------")
 	RunCommand("sudo", "drbdadm", "up", "mydrbd")
+	fmt.Println("-----------------")
 	RunCommand("sudo", "drbdadm", "secondary", "mydrbd")
 	fmt.Println("*****************")
 	RunCommand("sudo", "mkfs.ext4", "/dev/drbd0")
