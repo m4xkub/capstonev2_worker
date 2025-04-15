@@ -12,8 +12,13 @@ func GetRootController() *gin.Engine {
 	r.POST("/initMetaData", drbd.InitializeMetaData)
 	r.GET("/healthCheck", drbd.HealthCheck)
 	r.GET("/promote", drbd.Promote)
+	r.GET("/makeFileSystem", drbd.MakeFileSystem)
 	r.GET("/demote", drbd.Demote)
 	r.POST("/addClient", nbd.AddClient)
 	r.GET("/drbdCheck", drbd.DrbdCheck)
+
+	r.GET("/mountVolume", func(c *gin.Context) {
+		drbd.MountVolume()
+	})
 	return r
 }

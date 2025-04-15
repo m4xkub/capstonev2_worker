@@ -9,7 +9,7 @@ import (
 )
 
 func Demote(c *gin.Context) {
-	UnVolume()
+	Unvolume()
 	cmd := exec.Command("sudo", "drbdadm", "secondary", "mydrbd")
 
 	output, err := cmd.Output()

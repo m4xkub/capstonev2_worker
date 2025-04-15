@@ -18,7 +18,6 @@ func Promote(c *gin.Context) {
 		return
 	}
 
-	MountVolume()
 	c.JSON(http.StatusOK, gin.H{"message": string(output)})
 
 }
