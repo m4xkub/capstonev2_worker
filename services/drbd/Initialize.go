@@ -37,13 +37,13 @@ func manageResFile(instanceNumber string, privateIp string, diskname string) {
 	escapedDiskname := escapeSlashes(diskname)
 
 	// hostname
-	RunCommand("sed", "-i", fmt.Sprintf("s/hostname%s/%s/g", instanceNumber, hostname), "./mydrbd.res")
+	RunCommand("sudo", "sed", "-i", fmt.Sprintf("s/hostname%s/%s/g", instanceNumber, hostname), "./mydrbd.res")
 
 	// disk
-	RunCommand("sed", "-i", fmt.Sprintf("s/ec2disk%s/%s/g", instanceNumber, escapedDiskname), "./mydrbd.res")
+	RunCommand("sudo", "sed", "-i", fmt.Sprintf("s/ec2disk%s/%s/g", instanceNumber, escapedDiskname), "./mydrbd.res")
 
 	// private ip
-	RunCommand("sed", "-i", fmt.Sprintf("s/privateIp%s/%s/g", instanceNumber, privateIp), "./mydrbd.res")
+	RunCommand("sudo", "sed", "-i", fmt.Sprintf("s/privateIp%s/%s/g", instanceNumber, privateIp), "./mydrbd.res")
 }
 
 func InitializeConfigFile(c *gin.Context) {
@@ -60,7 +60,7 @@ func InitializeConfigFile(c *gin.Context) {
 	manageResFile("1", req.PrivateIp1, req.DiskName)
 	manageResFile("2", req.PrivateIp2, req.DiskName)
 
-	RunCommand("ln", "./mydrbd.res", "/etc/drbd.d/mydrbd.res")
+	RunCommand("sudo", "ln", "./mydrbd.res", "/etc/drbd.d/mydrbd.res")
 	fmt.Println("Initialization complete!")
 }
 
