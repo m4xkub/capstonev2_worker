@@ -2,10 +2,10 @@ package drbd
 
 import (
 	"fmt"
-	"os/exec"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/m4xkub/capstonev2_worker/services/utils"
 )
 
 type InitializationRequest struct {
@@ -18,17 +18,6 @@ func escapeSlashes(input string) string {
 	return strings.ReplaceAll(input, "/", "\\/")
 }
 
-func RunCommand(name string, args ...string) error {
-	cmd := exec.Command(name, args...)
-	cmd.Stdout = nil
-	cmd.Stderr = nil
-	err := cmd.Run()
-	if err != nil {
-		fmt.Printf("Error executing %s: %s\n", name, err.Error())
-	}
-	return err
-}
-
 func manageResFile(instanceNumber string, privateIp string, diskname string) {
 	parts := strings.Split(privateIp, ".")
 
@@ -37,13 +26,13 @@ func manageResFile(instanceNumber string, privateIp string, diskname string) {
 	escapedDiskname := escapeSlashes(diskname)
 
 	// hostname
-	RunCommand("sudo", "sed", "-i", fmt.Sprintf("s/hostname%s/%s/g", instanceNumber, hostname), "./mydrbd.res")
+	utils.RunCommand("sudo", "sed", "-i", fmt.Sprintf("s/hostname%s/%s/g", instanceNumber, hostname), "./mydrbd.res")
 
 	// disk
-	RunCommand("sudo", "sed", "-i", fmt.Sprintf("s/ec2disk%s/%s/g", instanceNumber, escapedDiskname), "./mydrbd.res")
+	utils.RunCommand("sudo", "sed", "-i", fmt.Sprintf("s/ec2disk%s/%s/g", instanceNumber, escapedDiskname), "./mydrbd.res")
 
 	// private ip
-	RunCommand("sudo", "sed", "-i", fmt.Sprintf("s/privateIp%s/%s/g", instanceNumber, privateIp), "./mydrbd.res")
+	utils.RunCommand("sudo", "sed", "-i", fmt.Sprintf("s/privateIp%s/%s/g", instanceNumber, privateIp), "./mydrbd.res")
 }
 
 func InitializeConfigFile(c *gin.Context) {
@@ -60,7 +49,7 @@ func InitializeConfigFile(c *gin.Context) {
 	manageResFile("1", req.PrivateIp1, req.DiskName)
 	manageResFile("2", req.PrivateIp2, req.DiskName)
 
-	RunCommand("sudo", "ln", "./mydrbd.res", "/etc/drbd.d/mydrbd.res")
+	utils.RunCommand("sudo", "ln", "./mydrbd.res", "/etc/drbd.d/mydrbd.res")
 	fmt.Println("Initialization complete!")
 }
 
@@ -68,11 +57,11 @@ func InitializeMetaData(c *gin.Context) {
 
 	fmt.Println("Creating DRBD Meta Data")
 
-	RunCommand("sudo", "drbdadm", "create-md", "mydrbd")
+	utils.RunCommand("sudo", "drbdadm", "create-md", "mydrbd")
 
-	RunCommand("sudo", "drbdadm", "up", "mydrbd")
+	utils.RunCommand("sudo", "drbdadm", "up", "mydrbd")
 
-	RunCommand("sudo", "drbdadm", "secondary", "mydrbd")
+	utils.RunCommand("sudo", "drbdadm", "secondary", "mydrbd")
 
 	fmt.Println("DRBD Meta Data Created")
 
@@ -81,7 +70,9 @@ func InitializeMetaData(c *gin.Context) {
 func MakeFileSystem(c *gin.Context) {
 	fmt.Println("Making filesystem")
 
-	RunCommand("sudo", "mkfs.ext4", "/dev/drbd0")
+	utils.RunCommand("sudo", "mkfs.ext4", "/dev/drbd0")
+	utils.RunCommand("sudo", "chown", "ubuntu:ubuntu", "/mnt")
+	utils.RunCommand("sudo", "chmod", "u+w", "/mnt")
 
 	fmt.Println("filesystem made")
 }
@@ -89,7 +80,7 @@ func MakeFileSystem(c *gin.Context) {
 func MountVolume() {
 	fmt.Println("Mounting file")
 
-	RunCommand("sudo", "mount", "/dev/drbd0", "/mnt")
+	utils.RunCommand("sudo", "mount", "/dev/drbd0", "/mnt")
 
 	fmt.Println("Mounted file")
 
@@ -98,7 +89,7 @@ func MountVolume() {
 func Unvolume() {
 	fmt.Println("Unmounting file")
 
-	RunCommand("sudo", "umount", "/mnt")
+	utils.RunCommand("sudo", "umount", "/mnt")
 
 	fmt.Println("unmounted file")
 

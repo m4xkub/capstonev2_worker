@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/m4xkub/capstonev2_worker/services/drbd"
+	"github.com/m4xkub/capstonev2_worker/services/migrate"
 	"github.com/m4xkub/capstonev2_worker/services/nbd"
 )
 
@@ -20,5 +21,7 @@ func GetRootController() *gin.Engine {
 	r.GET("/mountVolume", func(c *gin.Context) {
 		drbd.MountVolume()
 	})
+
+	r.POST("/migrate", migrate.SyncData)
 	return r
 }
