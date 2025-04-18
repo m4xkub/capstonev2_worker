@@ -21,12 +21,15 @@ func SyncData(c *gin.Context) {
 		return
 	}
 	destination := fmt.Sprintf("ubuntu@%s:/mnt", req.PrivateIp)
-	utils.RunCommand("sudo", "rsync", "-avz",
-		"--exclude=lost+found",
-		"-e", "ssh -i /home/ubuntu/capstonev2_worker/key.pem",
-		"/mnt/*",
-		destination,
+	err := utils.RunCommand("bash", "-c",
+		fmt.Sprintf("sudo rsync -avz --exclude=\"lost+found\" -e 'ssh -i /home/ubuntu/capstonev2_worker/key.pem' /mnt/* %s", destination),
 	)
+
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(500, gin.H{"message": err.Error()})
+
+	}
 
 	c.JSON(200, gin.H{"message": "complete"})
 }
