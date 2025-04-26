@@ -1,6 +1,8 @@
 package nbd
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/m4xkub/capstonev2_worker/services/utils"
 )
@@ -17,10 +19,8 @@ func AddClient(c *gin.Context) {
 		return
 	}
 
-	err := utils.RunCommand("sudo", "echo", req.IP, ">>", allowListPath)
-
-	//cmd := exec.Command("echo", req.IP, ">>", allowListPath)
-	//output, err := cmd.Output()
+	// Correct way: use bash -c and sudo tee -a (append)
+	err := utils.RunCommand("bash", "-c", fmt.Sprintf("echo '%s' | sudo tee -a %s", req.IP, allowListPath))
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
