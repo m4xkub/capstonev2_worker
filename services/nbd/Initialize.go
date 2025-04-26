@@ -2,7 +2,6 @@ package nbd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/m4xkub/capstonev2_worker/services/utils"
@@ -14,7 +13,7 @@ func InitializeConfigFile(c *gin.Context) {
 	utils.RunCommand("sudo", "apt-get", "install", "nbd-server", "nbd-client")
 	utils.RunCommand("sudo", "modprobe", "nbd")
 
-	// config file
+	// Your new config content
 	newConfig := `[generic]
 	listenaddr = 0.0.0.0
 	allowlist = true
@@ -30,13 +29,11 @@ func InitializeConfigFile(c *gin.Context) {
 	copyonwrite = false
 	`
 
-	// Overwrite the config file
-	err := os.WriteFile("/etc/nbd-server/config", []byte(newConfig), 0644)
-	if err != nil {
-		fmt.Println("Error writing new config file:", err)
-		c.JSON(500, gin.H{"error": "Failed to overwrite NBD config file"})
-		return
-	}
+	// Delete the old config file
+	utils.RunCommand("sudo", "rm", "-f", "/etc/nbd-server/config")
+
+	// Write new config
+	utils.RunCommand("bash", "-c", fmt.Sprintf("echo '%s' | sudo tee /etc/nbd-server/config", newConfig))
 
 	utils.RunCommand("sudo", "systemctl", "restart", "nbd-server")
 
