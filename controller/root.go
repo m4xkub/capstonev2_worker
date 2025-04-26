@@ -18,6 +18,8 @@ func GetRootController() *gin.Engine {
 	r.POST("/addClient", nbd.AddClient)
 	r.GET("/drbdCheck", drbd.DrbdCheck)
 
+	r.GET("/initNbd", nbd.InitializeConfigFile)
+
 	r.GET("/mountVolume", func(c *gin.Context) {
 		drbd.MountVolume()
 	})
