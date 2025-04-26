@@ -21,7 +21,7 @@ func InitializeConfigFile(c *gin.Context) {
 	group = root
 
 	[export1]
-	exportname = /var/nbd-disk.img
+	exportname = /dev/drbd0
 	readonly = false
 	allowlist = true
 	authfile = /etc/nbd-server/allowlist
