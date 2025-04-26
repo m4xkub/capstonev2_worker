@@ -35,6 +35,8 @@ func InitializeConfigFile(c *gin.Context) {
 	// Write new config
 	utils.RunCommand("bash", "-c", fmt.Sprintf("echo '%s' | sudo tee /etc/nbd-server/config", newConfig))
 
+	utils.RunCommand("sudo", "touch", "/etc/nbd-server/allowlist")
+
 	utils.RunCommand("sudo", "systemctl", "restart", "nbd-server")
 
 	fmt.Println("NBD Config fully replaced and server restarted.")
