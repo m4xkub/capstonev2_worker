@@ -37,6 +37,7 @@ func InitializeConfigFile(c *gin.Context) {
 
 	utils.RunCommand("sudo", "touch", "/etc/nbd-server/allowlist")
 
+	utils.RunCommand("sudo", "systemctl", "start", "nbd-server")
 	utils.RunCommand("sudo", "systemctl", "restart", "nbd-server")
 
 	utils.RunCommand("sudo", "umount", "/mnt")
