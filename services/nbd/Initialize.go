@@ -39,6 +39,7 @@ func InitializeConfigFile(c *gin.Context) {
 
 	utils.RunCommand("sudo", "systemctl", "restart", "nbd-server")
 
+	utils.RunCommand("sudo", "umount", "/mnt")
 	fmt.Println("NBD Config fully replaced and server restarted.")
 	c.JSON(200, gin.H{"message": "NBD config replaced and server restarted successfully!"})
 }
